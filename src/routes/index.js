@@ -6,10 +6,10 @@ const { showtimeRouter } = require('./showtime.router.js');
 const { reservationRouter } = require('./reservation.router.js');
 const rootRouter = express.Router();
 
-rootRouter.use('/user', userRouter);
-rootRouter.use('/cinema', cinemaRouter);
-rootRouter.use('/movie', movieRouter);
-rootRouter.use('/showtime', showtimeRouter);
-rootRouter.use('/reservation', reservationRouter);
+rootRouter.use('/', userRouter);
+rootRouter.use('/', cinemaRouter);
+rootRouter.use('/', movieRouter);
+rootRouter.use('/', showtimeRouter);
+rootRouter.use('/', reservationRouter);
 
 module.exports = { rootRouter };

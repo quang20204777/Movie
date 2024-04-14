@@ -25,6 +25,9 @@ const cinemaSchema = new Schema({
     type: Number,
     required: true,
   },
+  image: {
+    type: String,
+  },
 });
 
 const Cinema = mongoose.model("Cinema", cinemaSchema);

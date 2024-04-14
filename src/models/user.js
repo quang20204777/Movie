@@ -46,6 +46,9 @@ const userSchema = new Schema({
     default: "guest",
     enum: ["guest", "superadmin"],
   },
+  imageurl: {
+    type: String,
+  },
   tokens: [
     {
       token: {

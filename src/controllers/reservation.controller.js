@@ -1,98 +1,92 @@
-const { Reservation } = require("../model/reservation.js");
+const Reservation = require('../models/reservation');
+const userModeling = require('../utils/userModeling');
 
-// Create reservation --all user
 const createReservation = async (req, res) => {
   const reservation = new Reservation(req.body);
+
   try {
     await reservation.save();
-    res.status(201).send({ reservation});
+    res.status(201).send({ reservation, QRCode });
   } catch (e) {
-    console.log(e);
     res.status(400).send(e);
   }
 };
 
-// Get all reservations --all user
 const getAllReservations = async (req, res) => {
   try {
     const reservations = await Reservation.find({});
-    res.status(200).send(reservations);
+    res.send(reservations);
   } catch (e) {
     res.status(400).send(e);
   }
 };
 
-// Get reservation by id
 const getReservationById = async (req, res) => {
   const _id = req.params.id;
   try {
     const reservation = await Reservation.findById(_id);
-    return !reservation
-      ? res.status(404).send(`Not found reservation by ${_id}`)
-      : res.status(200).send(reservation);
+    return !reservation ? res.sendStatus(404) : res.send(reservation);
   } catch (e) {
     return res.status(400).send(e);
   }
 };
 
-// Get reservation checkin by id --vé đã được sử dụng
-const getReservationCheckinById = async (req, res) => {
+const checkinReservationById = async (req, res) => {
   const _id = req.params.id;
   try {
     const reservation = await Reservation.findById(_id);
     reservation.checkin = true;
     await reservation.save();
-    return !reservation
-      ? res.status(404).send(`Not found reservation by ${_id}`)
-      : res.status(200).send(reservation);
+    return !reservation ? res.sendStatus(404) : res.send(reservation);
   } catch (e) {
     res.status(400).send(e);
   }
 };
 
-// Update reservation by id
 const updateReservationById = async (req, res) => {
   const _id = req.params.id;
   const updates = Object.keys(req.body);
   const allowedUpdates = [
-    "date",
-    "startAt",
-    "seats",
-    "ticketPrice",
-    "total",
-    "username",
-    "phone",
-    "checkin",
+    'date',
+    'startAt',
+    'seats',
+    'ticketPrice',
+    'total',
+    'username',
+    'phone',
+    'checkin',
   ];
-  const isValidOperation = updates.every((update) =>
-    allowedUpdates.includes(update)
-  );
+  const isValidOperation = updates.every((update) => allowedUpdates.includes(update));
 
-  if (!isValidOperation)
-    return res.status(400).send({ error: "Invalid updates!" });
+  if (!isValidOperation) return res.status(400).send({ error: 'Invalid updates!' });
 
   try {
     const reservation = await Reservation.findById(_id);
     updates.forEach((update) => (reservation[update] = req.body[update]));
     await reservation.save();
-    return !reservation
-      ? res.status(404).send(`Not found reservation by ${_id}`)
-      : res.status(200).send(reservation);
+    return !reservation ? res.sendStatus(404) : res.send(reservation);
   } catch (e) {
     return res.status(400).send(e);
   }
 };
 
-// Delete reservation by id
 const deleteReservationById = async (req, res) => {
   const _id = req.params.id;
   try {
     const reservation = await Reservation.findByIdAndDelete(_id);
-    return !reservation
-      ? res.status(404).send(`Not found reservation by ${_id}`)
-      : res.status(200).send(reservation);
+    return !reservation ? res.sendStatus(404) : res.send(reservation);
   } catch (e) {
     return res.sendStatus(400);
+  }
+};
+
+const getUserModeledReservationSeats = async (req, res) => {
+  const { username } = req.params;
+  try {
+    const suggestedSeats = await userModeling.reservationSeatsUserModeling(username);
+    res.send(suggestedSeats);
+  } catch (e) {
+    res.status(400).send(e);
   }
 };
 
@@ -100,7 +94,8 @@ module.exports = {
   createReservation,
   getAllReservations,
   getReservationById,
-  getReservationCheckinById,
+  checkinReservationById,
   updateReservationById,
   deleteReservationById,
+  getUserModeledReservationSeats,
 };
